@@ -41,6 +41,10 @@ module Tao
         true
       end
 
+      def text(start, index = @current)
+        @source[start...index]
+      end
+
       def peek
         return "\0" if at_end?
         @source[@current]

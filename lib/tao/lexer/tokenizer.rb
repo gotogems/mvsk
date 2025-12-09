@@ -19,6 +19,7 @@ module Tao
         loop do
           break if @scanner.at_end?
           @start = @scanner.pos.index
+          @start_pos = @scanner.pos.dup
           scan_token
         end
 
@@ -32,10 +33,26 @@ module Tao
         return if skip_whitespace(char)
         return if skip_comment(char)
 
-        single_token(char) ||
-        double_token(char) ||
-        triple_token(char) ||
-        nil
+        case char
+        when '+' then add_token(op_get('+'), '+')
+        when '-' then add_token(op_get('-'), '-')
+        when '*' then add_token(op_get('*'), '*')
+        when '/' then add_token(op_get('/'), '/')
+        when '%' then add_token(op_get('%'), '%')
+        when '{' then add_token(punc_get('{'), '{')
+        when '}' then add_token(punc_get('}'), '}')
+        when '[' then add_token(punc_get('['), '[')
+        when ']' then add_token(punc_get(']'), ']')
+        when '(' then add_token(punc_get('('), '(')
+        when ')' then add_token(punc_get(')'), ')')
+        when ',' then add_token(punc_get(','), ',')
+        when ':' then add_token(punc_get(':'), ':')
+        when ';' then add_token(punc_get(';'), ';')
+        when '.' then add_token(punc_get('.'), '.')
+        when '"' then string_token(char)
+        else
+          number_token
+        end
       end
 
       def skip_whitespace(char)
@@ -62,11 +79,64 @@ module Tao
         end
       end
 
+      def string_token(char)
+        loop do
+          break if @scanner.peek == '"'
+          break if @scanner.at_end?
+
+          if @scanner.peek == "\n"
+            @scanner.pos.line += 1
+            @scanner.pos.col = 1
+          end
+
+          @scanner.advance
+        end
+
+        if @scanner.at_end?
+        end
+
+        @scanner.advance
+
+        text = @scanner.text(@start)
+        add_token(Token::String, text)
+      end
+
+      def number_token(char)
+        if digit_char?(char)
+          token_type = Token::Int
+
+          while digit_char?(@scanner.peek)
+            @scanner.advance
+          end
+
+          if @scanner.peek == '.' && digit_char?(@scanner.peek_next)
+            token_type = Token::Float
+            @scanner.advance
+
+            while digit_char?(@scanner.peek)
+              @scanner.advance
+            end
+          end
+
+          text = @scanner.text(@start)
+          add_token(token_type, text)
+        end
+      end
+
       def_delegator :@scanner, :whitespace?
       def_delegator :@scanner, :alpha_numeric?
       def_delegator :@scanner, :alpha_char?
       def_delegator :@scanner, :digit_char?
       def_delegator :@scanner, :match_char?
+
+      def add_token(type, lexeme = "")
+        Token.new(
+          type,
+          lexeme,
+          @start_pos,
+          @scanner.pos.dup
+        ).tap { |token| @tokens << token }
+      end
 
       def bool_token?(str)
         str == 'True' || str == 'False'
