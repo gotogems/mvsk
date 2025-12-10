@@ -13,6 +13,12 @@ module Tao
         @scanner = Scanner.new(source)
         @tokens  = []
         @start   = 0
+
+        init_sink
+      end
+
+      def init_sink
+        @error_sink = ErrorSink.new(@scanner)
       end
 
       def scan_tokens
@@ -87,12 +93,16 @@ module Tao
           if @scanner.peek == "\n"
             @scanner.pos.line += 1
             @scanner.pos.col = 1
+            @scanner.advance
+            break
           end
 
           @scanner.advance
         end
 
         if @scanner.at_end?
+          add_error(:unterminated)
+          return add_token(Token::Illegal, "")
         end
 
         @scanner.advance
@@ -136,6 +146,10 @@ module Tao
           @start_pos,
           @scanner.pos.dup
         ).tap { |token| @tokens << token }
+      end
+
+      def add_error(type, lexeme = "")
+        @error_sink.public_send(type, lexeme)
       end
 
       def bool_token?(str)
