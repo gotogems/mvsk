@@ -20,8 +20,9 @@ module Tao
         @stop_after_token = true
         @next_token = nil
         scan_tokens
+
         @stop_after_token = false
-        @next_token
+        @next_token || scan_tokens[-1]
       end
 
       def scan_tokens
@@ -36,7 +37,10 @@ module Tao
         end
 
         return if @stop_after_token
+        return @tokens if done?
+
         add_token(Token::EOF)
+        @_done = true
         @tokens
       end
 
@@ -229,6 +233,10 @@ module Tao
 
       def op_get(str)
         Internal::Operators[str]
+      end
+
+      def done?
+        @_done == true
       end
     end
   end

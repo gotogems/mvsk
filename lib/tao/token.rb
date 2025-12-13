@@ -34,5 +34,9 @@ module Tao
     def parse_bool(str)
       str.start_with?('T')
     end
+
+    def eof?
+      type == EOF
+    end
   end
 end
