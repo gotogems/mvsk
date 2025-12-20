@@ -21,6 +21,20 @@ module Tao
       end
     end
 
+    def parse_statement
+      return parse_if     if match?(Token::If)
+      return parse_loop   if match?(Token::Loop)
+      return parse_leave  if match?(Token::Leave)
+      return parse_match  if match?(Token::Match)
+      return parse_return if match?(Token::Return)
+      return parse_fun    if match?(Token::Fun)
+      return parse_self   if match?(Token::Self)
+      return parse_let    if match?(Token::Let)
+      return parse_data   if match?(Token::Data)
+
+      parse_expression
+    end
+
     def parse_expression(rbp = Parse::PrecLowest)
       rule = Parse::Rules.of(peek)
 
@@ -46,6 +60,30 @@ module Tao
 
     def parse_infix(left)
     end
+
+    def parse_identifier
+    end
+
+    def parse_unary
+      operator = operator
+      advance
+      right = parse_expression(lbp_of(operator))
+      expr = Nodes::UnaryExpr.new(operator, right)
+      expr
+    end
+
+    def parse_literal
+      expr = Nodes::Literal.new(peek.type, peek.value)
+      advance
+      expr
+    end
+
+    def precedence_of(token)
+      Parse::Precedence.of(token)
+    end
+
+    alias_method :lbp_of, :precedence_of
+    alias_method :rbp_of, :precedence_of
 
     def_delegator :@lexer, :next_token
     def_delegator :@lexer, :tokens
