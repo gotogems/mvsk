@@ -4,11 +4,11 @@ module Tao
 
     module Rules
       RULES = {
-        Token::Plus       => Rule.new(infix:        :parse_infix),
-        Token::Minus      => Rule.new(:parse_unary, :parse_infix),
-        Token::Star       => Rule.new(infix:        :parse_infix),
-        Token::Slash      => Rule.new(infix:        :parse_infix),
-        Token::Modulo     => Rule.new(infix:        :parse_infix),
+        Token::Plus       => Rule.new(infix:        :parse_binary),
+        Token::Minus      => Rule.new(:parse_unary, :parse_binary),
+        Token::Star       => Rule.new(infix:        :parse_binary),
+        Token::Slash      => Rule.new(infix:        :parse_binary),
+        Token::Modulo     => Rule.new(infix:        :parse_binary),
         Token::Greater    => Rule.new(infix:        :parse_infix),
         Token::GreaterEq  => Rule.new(infix:        :parse_infix),
         Token::Less       => Rule.new(infix:        :parse_infix),

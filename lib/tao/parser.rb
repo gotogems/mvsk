@@ -1,3 +1,7 @@
+require 'tao/parse/precedence'
+require 'tao/parse/rules'
+require 'tao/parse_error'
+
 module Tao
   class Parser
     extend Forwardable
@@ -38,7 +42,7 @@ module Tao
     def parse_expression(rbp = Parse::PrecLowest)
       rule = Parse::Rules.of(peek)
 
-      if rule.prefix.empty?
+      if rule.prefix.nil?
         raise ParseError
       end
 
@@ -46,9 +50,8 @@ module Tao
 
       while rbp < lbp_of(peek) do
         rule = Parse::Rules.of(peek)
-        break if rule.infix.empty?
+        break if rule.infix.nil?
 
-        advance
         left = send(rule.infix, left)
       end
 
@@ -65,16 +68,18 @@ module Tao
     end
 
     def parse_binary(left)
-      operator = peek
+      operator = peek.type
       advance
-      right = parse_expression(rbp_of(operator))
+
+      right = parse_expression(rbp_of(previous))
       Nodes::BinaryExpr.new(left, operator, right)
     end
 
     def parse_unary
-      operator = peek
+      operator = peek.type
       advance
-      right = parse_expression(rbp_of(operator))
+
+      right = parse_expression(Parse::PrecUnary)
       Nodes::UnaryExpr.new(operator, right)
     end
 

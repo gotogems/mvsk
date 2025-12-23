@@ -1,5 +1,5 @@
 module Tao
-  class ParseError
+  class ParseError < StandardError
     def initialize
 
     end
