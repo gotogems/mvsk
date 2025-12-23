@@ -64,12 +64,18 @@ module Tao
     def parse_identifier
     end
 
-    def parse_unary
-      operator = operator
+    def parse_binary(left)
+      operator = peek
       advance
-      right = parse_expression(lbp_of(operator))
-      expr = Nodes::UnaryExpr.new(operator, right)
-      expr
+      right = parse_expression(rbp_of(operator))
+      Nodes::BinaryExpr.new(left, operator, right)
+    end
+
+    def parse_unary
+      operator = peek
+      advance
+      right = parse_expression(rbp_of(operator))
+      Nodes::UnaryExpr.new(operator, right)
     end
 
     def parse_literal
