@@ -67,7 +67,15 @@ module Tao
     def parse_pipe(left)
     end
 
+    def parse_compare(left)
+      send(:parse_binary, left)
+    end
+
     def parse_grouping
+      advance
+      expr = parse_expression
+      expect(Token::RParen)
+      expr
     end
 
     def parse_identifier

@@ -39,6 +39,10 @@ module Tao
       def accept(visitor)
         visitor.visit_grouping_expr(self)
       end
+
+      def children
+        [@expr]
+      end
     end
 
     class Identifier < Expression
