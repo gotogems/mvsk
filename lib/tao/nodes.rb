@@ -31,17 +31,19 @@ module Tao
       end
     end
 
-    class GroupingExpr < Expression
-      def initialize(expr)
-        @expr = expr
+    class AssignExpr < Expression
+      def initialize(target, operator, value)
+        @target   = target
+        @operator = operator
+        @value    = value
       end
 
       def accept(visitor)
-        visitor.visit_grouping_expr(self)
+        visitor.visit_assign_expr(self)
       end
 
       def children
-        [@expr]
+        [@target, @value]
       end
     end
 

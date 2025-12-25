@@ -13,7 +13,7 @@ module Tao
         Token::GreaterEq  => Rule.new(infix:        :parse_compare),
         Token::Less       => Rule.new(infix:        :parse_compare),
         Token::LessEq     => Rule.new(infix:        :parse_compare),
-        Token::Equal      => Rule.new(infix:        :parse_infix),
+        Token::Equal      => Rule.new(infix:        :parse_assign),
         Token::EqualEq    => Rule.new(infix:        :parse_infix),
         Token::BangEq     => Rule.new(infix:        :parse_infix),
         Token::And        => Rule.new(infix:        :parse_binary),

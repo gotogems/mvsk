@@ -61,10 +61,21 @@ module Tao
     def parse_prefix
     end
 
-    def parse_infix(left)
+    def parse_pipe(left)
+      send(:parse_binary, left)
     end
 
-    def parse_pipe(left)
+    def parse_assign(left)
+      operator = peek.type
+      advance
+
+      value = parse_expression(Parse::PrecAssign - 1)
+
+      if left.is_a?(Nodes::Identifier)
+        Nodes::AssignExpr.new(left, operator, value)
+      else
+        raise ParseError
+      end
     end
 
     def parse_compare(left)
